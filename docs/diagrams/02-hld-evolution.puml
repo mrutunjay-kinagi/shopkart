@@ -1,0 +1,40 @@
+@startuml
+!include _style.iuml
+top to bottom direction
+actor Client
+component "Elastic Load Balancer" as lb
+component "API Gateway (Kong)\nrate limiting, auth" as gw
+package "Microservices (each module of the capstone becomes one service)" {
+  component "User Service" as us
+  component "Product Catalogue\nService" as pc
+  component "Cart Service" as cs
+  component "Order Service" as os
+  component "Payment Service" as ps
+  component "Notification Service" as ns
+}
+database "MySQL\n(users)" as m1
+database "MySQL + Elasticsearch\n(catalogue)" as m2
+database "Redis / MongoDB\n(carts)" as m3
+database "MySQL\n(orders)" as m4
+database "MySQL\n(payments)" as m5
+queue "Kafka" as k
+component "Amazon SES" as ses
+Client --> lb
+lb --> gw
+gw --> us
+gw --> pc
+gw --> cs
+gw --> os
+gw --> ps
+us --> m1
+pc --> m2
+cs --> m3
+os --> m4
+ps --> m5
+us ..> k
+cs ..> k
+os ..> k
+ps ..> k
+k ..> ns
+ns --> ses
+@enduml

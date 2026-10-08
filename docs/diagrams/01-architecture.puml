@@ -1,0 +1,46 @@
+@startuml
+!include _style.iuml
+left to right direction
+actor Customer
+actor Admin
+rectangle "ShopKart API  (Spring Boot 4, single deployable)" as app {
+  component "Security filter chain\n(JWT validation, denylist,\nCORS, request id)" as sec
+  package "Modules" {
+    component "User\n(auth, profile,\naddresses)" as user
+    component "Catalogue\n(products, categories,\nsearch, inventory)" as catalog
+    component "Cart" as cart
+    component "Order\n(checkout, tracking,\nexpiry job)" as order
+    component "Payment\n(gateway port,\nwebhooks, receipts)" as payment
+    component "Notification" as notif
+  }
+  component "Transactional outbox\n+ relay" as outbox
+}
+database "MySQL 8.4\n(system of record)" as mysql
+database "Redis 7.4\n(carts, product cache,\ntoken denylist, limits)" as redis
+queue "Kafka\n(domain events)" as kafka
+component "Payment gateway\n(MockPay sandbox)" as gw
+component "SMTP / Amazon SES" as smtp
+
+Customer --> sec : HTTPS / JSON
+Admin --> sec
+sec --> user
+sec --> catalog
+sec --> cart
+sec --> order
+sec --> payment
+user --> mysql
+catalog --> mysql
+catalog --> redis
+cart --> redis
+order --> mysql
+payment --> mysql
+payment --> gw
+order --> outbox
+payment --> outbox
+user --> outbox
+outbox --> kafka
+kafka --> order : payment events
+kafka --> payment : order events
+kafka --> notif : all events
+notif --> smtp
+@enduml

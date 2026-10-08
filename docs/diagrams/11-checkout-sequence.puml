@@ -1,0 +1,36 @@
+@startuml
+!include _style.iuml
+skinparam maxMessageSize 170
+skinparam ParticipantPadding 4
+skinparam BoxPadding 4
+autonumber
+actor Customer
+participant OrderController as C
+participant CheckoutService as S
+participant "CartStore\n(Redis)" as R
+participant InventoryService as I
+database MySQL as DB
+participant DomainEventPublisher as E
+Customer -> C : POST /orders/checkout\nIdempotency-Key: k1\n{shippingAddress, paymentMethod}
+C -> S : checkout(userId, request, k1)
+S -> DB : find order by (userId, k1)
+alt key already used
+  S --> C : existing order (replayed)
+  C --> Customer : 200 OK, Idempotent-Replayed: true
+else new request
+  S -> R : HGETALL cart:{userId}
+  S -> DB : BEGIN
+  S -> I : reserve(productId -> qty)
+  I -> DB : SELECT ... FROM products\nWHERE id IN (...) ORDER BY id FOR UPDATE
+  I -> I : check active and stock
+  I -> DB : UPDATE products SET stock_quantity = ...
+  S -> S : price from locked rows,\nshipping fee, order number
+  S -> DB : INSERT orders, order_items,\norder_status_history
+  S -> E : publish(OrderPlaced)
+  E -> DB : INSERT outbox_events
+  S -> DB : COMMIT
+  S -> R : DEL cart:{userId}
+  S --> C : OrderResponse
+  C --> Customer : 201 Created (PENDING_PAYMENT)
+end
+@enduml

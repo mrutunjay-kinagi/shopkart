@@ -1,0 +1,37 @@
+@startuml
+!include _style.iuml
+top to bottom direction
+actor Users
+component "Route 53 + CloudFront\n(TLS, edge cache for GET /products)" as cf
+rectangle "AWS Region ap-south-1 (Mumbai) - VPC 10.0.0.0/16" {
+  rectangle "Public subnets (AZ-a, AZ-b)" {
+    component "Application Load Balancer\nSG: 443 from Internet" as alb
+    component "NAT Gateway" as nat
+  }
+  rectangle "Private app subnets (AZ-a, AZ-b)" {
+    component "Elastic Beanstalk / ECS Fargate\nShopKart containers x N\n(Auto Scaling on CPU, p95 latency)\nSG: 8080 from ALB only" as app
+  }
+  rectangle "Private data subnets (AZ-a, AZ-b)" {
+    database "RDS for MySQL 8.4\nMulti-AZ\nSG: 3306 from app" as rds
+    database "ElastiCache for Redis\nprimary + replica\nSG: 6379 from app" as redis
+    queue "Amazon MSK (Kafka)\n3 brokers\nSG: 9098 from app" as msk
+  }
+}
+component "Secrets Manager\n(JWT key, DB creds,\nwebhook secret)" as sm
+component "Amazon SES" as ses
+component "CloudWatch\nlogs, metrics, alarms" as cw
+component "ECR\n(container images)" as ecr
+component "Payment gateway" as pg
+Users --> cf
+cf --> alb
+alb --> app
+app --> rds
+app --> redis
+app --> msk
+app --> sm
+app --> ses
+app --> cw
+app --> nat
+nat --> pg
+ecr --> app
+@enduml

@@ -1,0 +1,19 @@
+@startuml
+!include _style.iuml
+top to bottom direction
+rectangle "HTTP request\nPOST /api/v1/orders/checkout" as req
+rectangle "Servlet filters\nRequestIdFilter\nBearerTokenAuthenticationFilter" as f
+rectangle "DispatcherServlet\n(Spring MVC)" as ds
+rectangle "OrderController\n@Valid CheckoutRequest\nIdempotency-Key header" as c
+rectangle "CheckoutService\n(transaction boundary)" as s
+rectangle "Repositories / stores\nOrderRepository (JPA)\nProductRepository (FOR UPDATE)\nCartStore (Redis)" as r
+rectangle "OrderResponse DTO\nserialised by Jackson\n201 Created + Location" as v
+rectangle "GlobalExceptionHandler\nRFC 9457 problem+json" as e
+req --> f
+f --> ds
+ds --> c
+c --> s
+s --> r
+c --> v
+c ..> e : ApiException /\nvalidation error
+@enduml

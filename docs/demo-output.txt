@@ -1,0 +1,46 @@
+
+== Health
+{"groups":["liveness","readiness"],"status":"UP"}
+
+== Browse: categories and keyword search 'wireless headphones'
+[{"id":1,"name":"Electronics","parentId":null},{"id":2,"name":"Mobiles","parentId":1},{"id":3,"name":"Laptops","parentId":1},{"id":4,"name":"Audio","parentId":1},{"id":5,"name":"Fashion","parentId":null},{"id":6,"name":"Footwear","parentId":5},{"id":7,"name":"Men's Clothing","parentId":5},{"id":8,"name":"Home & Kitchen","parentId":null},{"id":9,"name":"Kitchen Appliances","parentId":8},{"id":10,"name":"Books","parentId":null}]
+{"totalElements":1,"first":{"id":8,"name":"WH-1000XM5 Wireless Noise Cancelling Headphones","price":26990.00,"inStock":true}}
+
+== Product details (second call is served from Redis)
+{"name":"WH-1000XM5 Wireless Noise Cancelling Headphones","price":26990.00,"mrp":34990.00,"discountPercent":22,"stockQuantity":50,"specifications":{"Connectivity":"Bluetooth 5.2","Type":"Over-ear","Battery":"30 hours"}}
+
+== Register demo.1791461208@example.com
+{"id":2,"email":"demo.1791461208@example.com","fullName":"Demo Customer","phone":"9876543210","role":"CUSTOMER","createdAt":"2026-10-08T12:06:51.227108Z"}
+
+== Cart: add items and review totals
+{"items":[{"name":"WH-1000XM5 Wireless Noise Cancelling Headphones","quantity":1,"lineTotal":26990.00},{"name":"JBL Flip 6 Portable Bluetooth Speaker","quantity":2,"lineTotal":19998.00}],"subtotal":46988.00,"savings":18000.00,"shippingFee":0.00,"total":46988.00,"checkoutReady":true}
+
+== Checkout (card), idempotent
+{"id":1,"orderNumber":"SK-261008-7KTQUR","status":"PENDING_PAYMENT","totalAmount":46988.00,"nextAction":"PAY","paymentDueAt":"2026-10-08T12:21:52.095823125Z"}
+
+== Pay with a declined card, then a good card
+{"status":"FAILED","failureReason":"Card declined by issuer"}
+{"id":2,"status":"SUCCEEDED","instrument":"VISA **** 4242","receiptNumber":"RCPT-0000000002"}
+
+== Order is confirmed asynchronously via Kafka (PaymentSucceeded -> order-service)
+order status: CONFIRMED
+{"receiptNumber":"RCPT-0000000002","orderNumber":"SK-261008-7KTQUR","method":"CARD","instrument":"VISA **** 4242","totalPaid":46988.00,"lines":["WH-1000XM5 Wireless Noise Cancelling Headphones","JBL Flip 6 Portable Bluetooth Speaker"]}
+
+== Admin ships and delivers the order
+{"status":"SHIPPED"}
+{"status":"SHIPPED","carrier":"BlueDart","trackingNumber":"BD7781234560IN","estimatedDelivery":"2026-10-11","timeline":["PENDING_PAYMENT","PENDING_PAYMENT","CONFIRMED","SHIPPED"]}
+{"status":"DELIVERED"}
+
+== UPI order confirmed by a signed gateway webhook
+{"status":"PENDING","instrument":"UPI de***@okicici"}
+webhook -> HTTP 204
+{"orderNumber":"SK-261008-8DLZXX","status":"CONFIRMED"}
+
+== Order history
+[{"orderNumber":"SK-261008-8DLZXX","status":"CONFIRMED","itemCount":1,"totalAmount":9999.00},{"orderNumber":"SK-261008-7KTQUR","status":"DELIVERED","itemCount":3,"totalAmount":46988.00}]
+
+== Logout revokes the token immediately
+logout -> HTTP 204
+GET /users/me after logout -> HTTP 401
+
+E-mails sent during the demo: http://localhost:8025   API docs: http://localhost:8080/swagger-ui.html

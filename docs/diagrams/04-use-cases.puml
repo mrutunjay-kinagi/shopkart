@@ -1,0 +1,49 @@
+@startuml
+!include _style.iuml
+left to right direction
+actor Guest
+actor Customer
+actor Admin
+actor "Payment gateway" as PG
+actor "E-mail service" as Mail
+Guest <|-- Customer
+rectangle ShopKart {
+  usecase "Browse categories" as UC1
+  usecase "Search products" as UC2
+  usecase "View product details" as UC3
+  usecase "Register / log in" as UC4
+  usecase "Reset password" as UC5
+  usecase "Manage profile\nand addresses" as UC6
+  usecase "Manage cart" as UC7
+  usecase "Checkout" as UC8
+  usecase "Pay for order" as UC9
+  usecase "View receipt" as UC10
+  usecase "View order history" as UC11
+  usecase "Track order" as UC12
+  usecase "Cancel order" as UC13
+  usecase "Log out" as UC14
+  usecase "Manage catalogue\nand stock" as UC15
+  usecase "Ship / deliver orders" as UC16
+  usecase "Receive notifications" as UC17
+}
+Guest --> UC1
+Guest --> UC2
+Guest --> UC3
+Guest --> UC4
+Guest --> UC5
+Customer --> UC6
+Customer --> UC7
+Customer --> UC8
+Customer --> UC9
+Customer --> UC10
+Customer --> UC11
+Customer --> UC12
+Customer --> UC13
+Customer --> UC14
+UC8 ..> UC9 : <<precedes>>
+UC9 --> PG
+Admin --> UC15
+Admin --> UC16
+UC17 --> Mail
+Customer --> UC17
+@enduml

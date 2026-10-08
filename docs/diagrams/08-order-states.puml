@@ -1,0 +1,15 @@
+@startuml
+!include _style.iuml
+[*] --> PENDING_PAYMENT : checkout (CARD / UPI / NETBANKING)
+[*] --> CONFIRMED : checkout (COD)
+PENDING_PAYMENT --> CONFIRMED : PaymentSucceeded
+PENDING_PAYMENT --> CANCELLED : customer cancels /\npayment window expires
+CONFIRMED --> SHIPPED : admin ships\n(carrier + tracking no.)
+CONFIRMED --> CANCELLED : customer cancels\n(refund issued)
+SHIPPED --> OUT_FOR_DELIVERY
+SHIPPED --> DELIVERED
+OUT_FOR_DELIVERY --> DELIVERED
+DELIVERED --> [*]
+CANCELLED --> [*]
+note right of CANCELLED : stock released,\nOrderCancelled event
+@enduml

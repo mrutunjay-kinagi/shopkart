@@ -1,0 +1,31 @@
+@startuml
+!include _style.iuml
+skinparam maxMessageSize 170
+skinparam ParticipantPadding 4
+skinparam BoxPadding 4
+autonumber
+actor Customer
+participant PaymentService as P
+participant "Redis" as R
+participant "MockPay" as G
+database MySQL as DB
+participant OutboxRelay as OR
+queue Kafka as K
+participant "order-service\nlistener" as OL
+participant "notification\nlistener" as NL
+Customer -> P : POST /orders/{id}/payments\n{cardToken: tok_visa_4242}
+P -> R : SET lock:pay:order:{id} NX EX 30
+P -> DB : tx1: validate order, INSERT payment (PENDING)
+P -> G : charge(token, amount)
+G --> P : SUCCEEDED, gatewayRef, "VISA **** 4242"
+P -> DB : tx2: UPDATE payment SUCCEEDED, receipt no.\nINSERT outbox_events (PaymentSucceeded)
+P -> R : DEL lock
+P --> Customer : 201 {status: SUCCEEDED, receiptNumber}
+OR -> DB : SELECT unpublished ... FOR UPDATE SKIP LOCKED
+OR -> K : send(shopkart.payment.events, key=paymentId)
+OR -> DB : UPDATE outbox_events SET published_at
+K -> OL : PaymentSucceeded
+OL -> DB : tx: skip if processed; order -> CONFIRMED;\nINSERT outbox (OrderConfirmed), processed_events
+K -> NL : PaymentSucceeded
+NL -> NL : send receipt e-mail
+@enduml

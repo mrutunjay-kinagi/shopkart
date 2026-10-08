@@ -1,0 +1,137 @@
+@startuml
+!include _style.iuml
+hide circle
+hide empty methods
+skinparam linetype ortho
+entity users {
+  * id : BIGINT <<PK>>
+  --
+  * email : VARCHAR(254) <<UK>>
+  * password_hash : VARCHAR(100)
+  * full_name : VARCHAR(120)
+  phone : VARCHAR(20)
+  * role : VARCHAR(20)
+  * enabled : BOOLEAN
+}
+entity addresses {
+  * id : BIGINT <<PK>>
+  --
+  * user_id : BIGINT <<FK>>
+  * label, recipient_name, phone
+  * line1, city, state, postal_code
+  line2, country, is_default
+}
+entity refresh_tokens {
+  * id : BIGINT <<PK>>
+  --
+  * user_id : BIGINT <<FK>>
+  * token_hash : CHAR(64) <<UK>>
+  * family_id : CHAR(36)
+  * expires_at ; revoked_at ; replaced_by
+}
+entity password_reset_tokens {
+  * id : BIGINT <<PK>>
+  --
+  * user_id : BIGINT <<FK>>
+  * token_hash : CHAR(64) <<UK>>
+  * expires_at ; used_at
+}
+entity categories {
+  * id : BIGINT <<PK>>
+  --
+  * name ; slug <<UK>>
+  description
+  parent_id : BIGINT <<FK>>
+}
+entity products {
+  * id : BIGINT <<PK>>
+  --
+  * sku <<UK>> ; slug <<UK>>
+  * name ; brand ; description
+  * price ; mrp : DECIMAL(12,2)
+  * stock_quantity : INT
+  * category_id : BIGINT <<FK>>
+  * active ; version
+}
+entity product_images {
+  * product_id : BIGINT <<PK,FK>>
+  * position : INT <<PK>>
+  --
+  * url
+}
+entity product_specifications {
+  * product_id : BIGINT <<PK,FK>>
+  * spec_key <<PK>>
+  --
+  * spec_value
+}
+entity orders {
+  * id : BIGINT <<PK>>
+  --
+  * order_number <<UK>>
+  * user_id : BIGINT <<FK>>
+  * status ; payment_method
+  * subtotal ; shipping_fee ; total_amount
+  idempotency_key  (UK with user_id)
+  * ship_* (address snapshot)
+  carrier ; tracking_number
+  payment_due_at ; version
+}
+entity order_items {
+  * id : BIGINT <<PK>>
+  --
+  * order_id : BIGINT <<FK>>
+  * product_id : BIGINT <<FK>>
+  * sku ; product_name
+  * unit_price ; quantity ; line_total
+}
+entity order_status_history {
+  * id : BIGINT <<PK>>
+  --
+  * order_id : BIGINT <<FK>>
+  * status ; note ; changed_at
+}
+entity payments {
+  * id : BIGINT <<PK>>
+  --
+  * order_id : BIGINT <<FK>>
+  * user_id : BIGINT <<FK>>
+  * method ; status ; amount
+  * gateway ; gateway_reference
+  instrument_summary ; failure_reason
+  receipt_number <<UK>> ; paid_at ; version
+}
+entity outbox_events {
+  * id : BIGINT <<PK>>
+  --
+  * event_id <<UK>> ; topic
+  * aggregate_type ; aggregate_id
+  * event_type ; payload : TEXT
+  published_at ; attempts
+}
+entity processed_events {
+  * consumer <<PK>>
+  * event_id <<PK>>
+  --
+  * processed_at
+}
+entity notifications {
+  * id : BIGINT <<PK>>
+  --
+  user_id ; channel ; recipient
+  * template ; subject ; status
+}
+users ||--o{ addresses
+users ||--o{ refresh_tokens
+users ||--o{ password_reset_tokens
+users ||--o{ orders
+users ||--o{ payments
+categories ||--o{ products
+categories |o--o{ categories
+products ||--o{ product_images
+products ||--o{ product_specifications
+products ||--o{ order_items
+orders ||--|{ order_items
+orders ||--|{ order_status_history
+orders ||--o{ payments
+@enduml

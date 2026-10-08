@@ -1,0 +1,17 @@
+shopkart:
+  outbox:
+    poll-interval: 100ms
+  orders:
+    expiry-check-interval: 1h
+  rate-limit:
+    login-attempts-per-minute: 1000
+spring:
+  kafka:
+    consumer:
+      properties:
+        metadata.max.age.ms: 1000
+logging:
+  level:
+    org.apache.kafka: WARN
+    org.testcontainers: WARN
+    tc: WARN

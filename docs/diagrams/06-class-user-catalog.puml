@@ -1,0 +1,72 @@
+@startuml
+!include _style.iuml
+hide empty methods
+abstract class BaseEntity {
+  #id : Long
+  #createdAt : Instant
+  #updatedAt : Instant
+}
+class User {
+  email : String
+  passwordHash : String
+  fullName : String
+  phone : String
+  role : Role
+  enabled : boolean
+  +updateProfile(name, phone)
+  +changePasswordHash(hash)
+}
+enum Role {
+  CUSTOMER
+  ADMIN
+}
+class Address {
+  userId : Long
+  label, recipientName, phone
+  line1, line2, city, state
+  postalCode, country
+  defaultAddress : boolean
+}
+class RefreshToken {
+  userId : Long
+  tokenHash : String
+  familyId : String
+  expiresAt, revokedAt : Instant
+  replacedBy : Long
+  +isActive(now) : boolean
+  +revoke(at, replacedBy)
+}
+class PasswordResetToken {
+  userId : Long
+  tokenHash : String
+  expiresAt, usedAt : Instant
+  +isUsable(now) : boolean
+}
+class Category {
+  name, slug, description
+  parentId : Long
+}
+class Product {
+  sku, name, slug, brand
+  description : String
+  price, mrp : BigDecimal
+  stockQuantity : int
+  active : boolean
+  version : long
+  images : List<String>
+  specifications : Map<String,String>
+  +canFulfil(qty) : boolean
+  +decreaseStock(qty)
+  +increaseStock(qty)
+}
+BaseEntity <|-- User
+BaseEntity <|-- Address
+BaseEntity <|-- Category
+BaseEntity <|-- Product
+User --> Role
+User "1" -- "0..10" Address
+User "1" -- "*" RefreshToken
+User "1" -- "*" PasswordResetToken
+Category "1" -- "*" Product
+Category "0..1" -- "*" Category : parent
+@enduml

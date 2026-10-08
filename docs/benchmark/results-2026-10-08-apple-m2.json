@@ -1,0 +1,222 @@
+{
+  "environment" : {
+    "measuredAt" : "2026-10-08T12:02:28.344284Z",
+    "jvm" : "23.0.1+11-39",
+    "cpu" : "aarch64",
+    "products" : 100000
+  },
+  "search" : [ {
+    "query" : "wireless",
+    "matches" : 7117,
+    "likeMatches" : 7117,
+    "like" : {
+      "meanMs" : 111.91,
+      "p50Ms" : 110.649,
+      "p95Ms" : 113.087,
+      "p99Ms" : 150.402,
+      "samples" : 30
+    },
+    "fulltext" : {
+      "meanMs" : 28.424,
+      "p50Ms" : 28.304,
+      "p95Ms" : 30.672,
+      "p99Ms" : 30.872,
+      "samples" : 30
+    },
+    "speedup" : 3.909,
+    "likePlan" : {
+      "type" : "ALL",
+      "key" : null,
+      "rows" : 97432
+    },
+    "fulltextPlan" : {
+      "type" : "fulltext",
+      "key" : "ftx_products_search",
+      "rows" : 1
+    }
+  }, {
+    "query" : "gaming laptop",
+    "matches" : 3637,
+    "likeMatches" : 3637,
+    "like" : {
+      "meanMs" : 161.556,
+      "p50Ms" : 160.258,
+      "p95Ms" : 168.552,
+      "p99Ms" : 170.753,
+      "samples" : 30
+    },
+    "fulltext" : {
+      "meanMs" : 77.864,
+      "p50Ms" : 76.864,
+      "p95Ms" : 82.3,
+      "p99Ms" : 84.496,
+      "samples" : 30
+    },
+    "speedup" : 2.085,
+    "likePlan" : {
+      "type" : "ALL",
+      "key" : null,
+      "rows" : 97432
+    },
+    "fulltextPlan" : {
+      "type" : "fulltext",
+      "key" : "ftx_products_search",
+      "rows" : 1
+    }
+  }, {
+    "query" : "stainless kettle",
+    "matches" : 374,
+    "likeMatches" : 374,
+    "like" : {
+      "meanMs" : 129.848,
+      "p50Ms" : 129.335,
+      "p95Ms" : 133.334,
+      "p99Ms" : 134.483,
+      "samples" : 30
+    },
+    "fulltext" : {
+      "meanMs" : 11.935,
+      "p50Ms" : 11.614,
+      "p95Ms" : 12.922,
+      "p99Ms" : 15.976,
+      "samples" : 30
+    },
+    "speedup" : 11.136,
+    "likePlan" : {
+      "type" : "ALL",
+      "key" : null,
+      "rows" : 97432
+    },
+    "fulltextPlan" : {
+      "type" : "fulltext",
+      "key" : "ftx_products_search",
+      "rows" : 1
+    }
+  }, {
+    "query" : "leather wallet",
+    "matches" : 3469,
+    "likeMatches" : 3469,
+    "like" : {
+      "meanMs" : 159.194,
+      "p50Ms" : 157.482,
+      "p95Ms" : 162.32,
+      "p99Ms" : 197.667,
+      "samples" : 30
+    },
+    "fulltext" : {
+      "meanMs" : 76.158,
+      "p50Ms" : 75.448,
+      "p95Ms" : 80.37,
+      "p99Ms" : 83.033,
+      "samples" : 30
+    },
+    "speedup" : 2.087,
+    "likePlan" : {
+      "type" : "ALL",
+      "key" : null,
+      "rows" : 97432
+    },
+    "fulltextPlan" : {
+      "type" : "fulltext",
+      "key" : "ftx_products_search",
+      "rows" : 1
+    }
+  }, {
+    "query" : "zenith camera",
+    "matches" : 365,
+    "likeMatches" : 365,
+    "like" : {
+      "meanMs" : 119.597,
+      "p50Ms" : 117.255,
+      "p95Ms" : 129.793,
+      "p99Ms" : 158.013,
+      "samples" : 30
+    },
+    "fulltext" : {
+      "meanMs" : 16.668,
+      "p50Ms" : 14.517,
+      "p95Ms" : 30.185,
+      "p99Ms" : 46.564,
+      "samples" : 30
+    },
+    "speedup" : 8.077,
+    "likePlan" : {
+      "type" : "ALL",
+      "key" : null,
+      "rows" : 97432
+    },
+    "fulltextPlan" : {
+      "type" : "fulltext",
+      "key" : "ftx_products_search",
+      "rows" : 1
+    }
+  } ],
+  "categoryBrowse" : {
+    "withoutIndex" : {
+      "meanMs" : 20.218,
+      "p50Ms" : 19.898,
+      "p95Ms" : 21.366,
+      "p99Ms" : 26.874,
+      "samples" : 50
+    },
+    "withIndex" : {
+      "meanMs" : 0.787,
+      "p50Ms" : 0.562,
+      "p95Ms" : 1.924,
+      "p99Ms" : 3.366,
+      "samples" : 50
+    },
+    "speedup" : 35.435,
+    "planWithout" : {
+      "type" : "ALL",
+      "key" : null,
+      "rows" : 97432
+    },
+    "planWith" : {
+      "type" : "ref",
+      "key" : "idx_products_category_active_price",
+      "rows" : 5412
+    }
+  },
+  "productCache" : {
+    "serviceMySql" : {
+      "meanMs" : 2.714,
+      "p50Ms" : 2.526,
+      "p95Ms" : 3.638,
+      "p99Ms" : 6.196,
+      "samples" : 2000
+    },
+    "serviceRedis" : {
+      "meanMs" : 0.377,
+      "p50Ms" : 0.339,
+      "p95Ms" : 0.461,
+      "p99Ms" : 0.727,
+      "samples" : 2000
+    },
+    "serviceSpeedup" : 7.448,
+    "httpCacheMiss" : {
+      "meanMs" : 3.983,
+      "p50Ms" : 3.845,
+      "p95Ms" : 5.265,
+      "p99Ms" : 7.036,
+      "samples" : 1000
+    },
+    "httpCacheHit" : {
+      "meanMs" : 0.617,
+      "p50Ms" : 0.581,
+      "p95Ms" : 0.805,
+      "p99Ms" : 1.131,
+      "samples" : 1000
+    },
+    "httpSpeedup" : 6.615,
+    "httpThroughputMissRps" : 251.05,
+    "httpThroughputHitRps" : 1621.193
+  },
+  "checkout" : {
+    "meanMs" : 14.186,
+    "p50Ms" : 7.999,
+    "p95Ms" : 48.045,
+    "p99Ms" : 52.534,
+    "samples" : 200
+  }
+}

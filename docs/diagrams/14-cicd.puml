@@ -1,0 +1,15 @@
+@startuml
+!include _style.iuml
+top to bottom direction
+rectangle "git push /\npull request" as a
+rectangle "GitHub Actions\n./mvnw verify\n(unit + Testcontainers\nintegration tests,\nJaCoCo coverage)" as b
+rectangle "docker build\n(layered image)\npush to ECR" as c
+rectangle "Flyway migrations\nrun on start-up\n(backward compatible)" as d
+rectangle "Rolling / blue-green\ndeploy to Beanstalk/ECS\nreadiness probe gates traffic" as e
+rectangle "CloudWatch alarms\n(5xx rate, p95 latency,\noutbox backlog)\nauto rollback" as f
+a --> b
+b --> c : main branch
+c --> d
+d --> e
+e --> f
+@enduml

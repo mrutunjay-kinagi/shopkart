@@ -1,0 +1,33 @@
+!pragma layout smetana
+skinparam dpi 200
+skinparam shadowing false
+skinparam defaultFontName Helvetica
+skinparam defaultFontSize 12
+skinparam backgroundColor white
+skinparam ArrowColor #37474F
+skinparam roundcorner 8
+skinparam package {
+  BorderColor #546E7A
+  BackgroundColor #FAFAFA
+}
+skinparam component {
+  BorderColor #1E3A5F
+  BackgroundColor #E3F2FD
+}
+skinparam database {
+  BorderColor #4E342E
+  BackgroundColor #FFF3E0
+}
+skinparam queue {
+  BorderColor #1B5E20
+  BackgroundColor #E8F5E9
+}
+skinparam class {
+  BorderColor #1E3A5F
+  BackgroundColor #F5F9FF
+  HeaderBackgroundColor #E3F2FD
+}
+skinparam note {
+  BorderColor #9E9E9E
+  BackgroundColor #FFFDE7
+}

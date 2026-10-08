@@ -1,0 +1,109 @@
+spring:
+  application:
+    name: shopkart
+  threads:
+    virtual:
+      enabled: true
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/shopkart?useUnicode=true&characterEncoding=utf8&connectionTimeZone=UTC}
+    username: ${DB_USERNAME:shopkart}
+    password: ${DB_PASSWORD:shopkart}
+    hikari:
+      maximum-pool-size: ${DB_POOL_SIZE:20}
+      connection-timeout: 3000
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+          batch_size: 50
+        order_inserts: true
+        default_batch_fetch_size: 50
+  flyway:
+    enabled: true
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      timeout: 2s
+  cache:
+    type: redis
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      acks: all
+      properties:
+        enable.idempotence: true
+        linger.ms: 5
+    consumer:
+      auto-offset-reset: earliest
+      properties:
+        isolation.level: read_committed
+  mvc:
+    problemdetails:
+      enabled: true
+
+server:
+  shutdown: graceful
+  error:
+    include-message: never
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, prometheus, metrics
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  metrics:
+    tags:
+      application: shopkart
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+  default-produces-media-type: application/json
+
+shopkart:
+  jwt:
+    # 256-bit base64 key. Override with JWT_SECRET (e.g. from AWS Secrets Manager) everywhere but local dev.
+    secret: ${JWT_SECRET:c2hvcGthcnQtbG9jYWwtZGV2LXNlY3JldC1jaGFuZ2UtbWUtMzJieXRlcyE=}
+    access-token-ttl: 15m
+    refresh-token-ttl: 7d
+  payments:
+    mockpay-webhook-secret: ${MOCKPAY_WEBHOOK_SECRET:mockpay-local-webhook-secret}
+  orders:
+    payment-window: 15m
+  cart:
+    ttl: 30d
+  web:
+    frontend-base-url: ${FRONTEND_BASE_URL:http://localhost:3000}
+    allowed-origins: ${ALLOWED_ORIGINS:http://localhost:3000}
+  rate-limit:
+    login-attempts-per-minute: 10
+  seed:
+    enabled: ${SEED_DATA:false}
+    admin-email: ${ADMIN_EMAIL:admin@shopkart.local}
+    admin-password: ${ADMIN_PASSWORD:Admin@12345}
+
+logging:
+  pattern:
+    level: "%5p [${spring.application.name},%X{requestId:-}]"
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  mail:
+    host: ${MAIL_HOST:localhost}
+    port: ${MAIL_PORT:1025}
+shopkart:
+  seed:
+    enabled: true

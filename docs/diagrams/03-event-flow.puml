@@ -1,0 +1,24 @@
+@startuml
+!include _style.iuml
+top to bottom direction
+component "User module" as U
+component "Cart module" as C
+component "Order module" as O
+component "Payment module" as P
+queue "shopkart.user.events\nUserRegistered" as tu
+queue "shopkart.cart.events\nCartItemAdded" as tc
+queue "shopkart.order.events\nOrderPlaced, OrderConfirmed,\nOrderShipped, OrderDelivered,\nOrderCancelled" as to
+queue "shopkart.payment.events\nPaymentSucceeded, PaymentFailed,\nPaymentRefunded" as tp
+component "Notification module\n(group notification-service)" as N
+component "Analytics (future)" as A
+U --> tu : outbox
+C --> tc : direct, best effort
+O --> to : outbox
+P --> tp : outbox
+tp --> O : group order-service\nconfirm order
+to --> P : group payment-service\nCOD settle / refund
+tu --> N
+to --> N
+tp --> N
+tc ..> A
+@enduml

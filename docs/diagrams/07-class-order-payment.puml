@@ -1,0 +1,85 @@
+@startuml
+!include _style.iuml
+hide empty methods
+class Order {
+  orderNumber : String
+  userId : Long
+  status : OrderStatus
+  paymentMethod : PaymentMethod
+  subtotal, shippingFee, totalAmount : BigDecimal
+  idempotencyKey : String
+  carrier, trackingNumber : String
+  paymentDueAt : Instant
+  version : long
+  +addItem(...)
+  +price(subtotal, shipping)
+  +transitionTo(status, note)
+  +note(text)
+  +assignShipment(carrier, tracking)
+}
+class ShippingAddress <<embeddable>> {
+  recipientName, phone
+  line1, line2, city
+  state, postalCode, country
+}
+class OrderItem {
+  productId : Long
+  sku, productName : String
+  unitPrice, lineTotal : BigDecimal
+  quantity : int
+}
+class OrderStatusChange {
+  status : OrderStatus
+  note : String
+  changedAt : Instant
+}
+enum OrderStatus {
+  PENDING_PAYMENT
+  CONFIRMED
+  SHIPPED
+  OUT_FOR_DELIVERY
+  DELIVERED
+  CANCELLED
+  +canTransitionTo(target)
+}
+enum PaymentMethod {
+  CARD
+  UPI
+  NETBANKING
+  COD
+}
+class Payment {
+  orderId, userId : Long
+  method : PaymentMethod
+  status : PaymentStatus
+  amount : BigDecimal
+  gateway, gatewayReference : String
+  instrumentSummary : String
+  receiptNumber : String
+  paidAt : Instant
+  version : long
+  +succeed(ref, instrument, at)
+  +fail(ref, reason)
+  +refunded()
+}
+enum PaymentStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  REFUNDED
+}
+interface PaymentGateway {
+  +charge(ChargeRequest) : ChargeResult
+  +refund(ref, amount) : RefundResult
+  +verifyWebhookSignature(body, sig) : boolean
+}
+class MockPayGateway
+Order *-- ShippingAddress
+Order "1" *-- "1..*" OrderItem
+Order "1" *-- "1..*" OrderStatusChange : timeline
+Order --> OrderStatus
+Order --> PaymentMethod
+Order "1" .. "*" Payment : orderId
+Payment --> PaymentStatus
+PaymentGateway <|.. MockPayGateway
+@enduml

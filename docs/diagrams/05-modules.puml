@@ -1,0 +1,49 @@
+@startuml
+!include _style.iuml
+top to bottom direction
+package "api (controllers, DTOs)" as API #E3F2FD
+package user {
+  component "AuthService\nUserService\nTokenService" as US
+  component "UserDirectory\n<<interface>>" as UD
+  component "PasswordResetNotifier\n<<interface>>" as PRN
+}
+package catalog {
+  component "ProductService\nProductSearchRepository" as PS
+  component "InventoryService" as INV
+}
+package cart {
+  component "CartService\nCartStore (Redis)" as CS
+}
+package order {
+  component "CheckoutService\nOrderService\nOrderExpiryJob" as OS
+  component "OrderLookup\n<<interface>>" as OL
+}
+package payment {
+  component "PaymentService" as PAY
+  component "PaymentGateway\n<<interface>>\nMockPayGateway" as GW
+}
+package notification {
+  component "NotificationService\nEmailSender" as NS
+}
+package common {
+  component "DomainEventPublisher\nOutboxRelay\nIdempotentEventHandler\nEventPayloads" as EV
+}
+API --> US
+API --> PS
+API --> CS
+API --> OS
+API --> PAY
+CS --> PS
+OS --> CS
+OS --> INV
+OS --> UD
+PAY --> OL
+PAY --> GW
+NS --> UD
+NS ..|> PRN
+US --> PRN
+US --> EV
+OS --> EV
+PAY --> EV
+NS --> EV
+@enduml
